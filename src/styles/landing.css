@@ -1,0 +1,107 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f3f1e8;
+}
+
+.sidebar {
+  width: 260px;
+  background: #1b2910;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #d9b85e;
+}
+
+.new-chat {
+  margin-top: 20px;
+  border: none;
+  background: #4d6530;
+  color: white;
+  padding: 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.search-box {
+  margin-top: 12px;
+  background: #243516;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.main {
+  flex: 1;
+  padding: 40px;
+}
+
+.hero {
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 48px;
+  margin-top: 16px;
+}
+
+.hero p {
+  color: #585c4c;
+}
+
+.agent-grid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.agent-card {
+  position: relative;
+  background: white;
+  border: 1px solid #dcd9c8;
+  border-radius: 18px;
+  padding: 20px;
+  transition: 0.3s;
+}
+
+.agent-card:hover {
+  transform: translateY(-4px);
+}
+
+.live-badge {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: #eef5e5;
+  color: #4d6530;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.community {
+  margin-top: 40px;
+  background: #ece9dc;
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.community-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}

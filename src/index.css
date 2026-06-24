@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #f3f1e8;
+}
+
+/* Center Core */
+
+.center-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: 20px;
+  height: 20px;
+
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+
+  background: #d9b85e;
+
+  box-shadow:
+    0 0 20px rgba(217, 184, 94, 0.9),
+    0 0 80px rgba(217, 184, 94, 0.4);
+}
+
+/* Orbits */
+
+.orbit {
+  position: absolute;
+  inset: 0;
+
+  border-radius: 9999px;
+  border: 1px solid rgba(217, 184, 94, 0.12);
+}
+
+.orbit-node {
+  position: absolute;
+
+  top: -8px;
+  left: 50%;
+
+  width: 14px;
+  height: 14px;
+
+  transform: translateX(-50%);
+  border-radius: 9999px;
+
+  background: #d9b85e;
+
+  box-shadow:
+    0 0 10px rgba(217, 184, 94, 0.9);
+}
+
+/* Orbit Sizes */
+
+.orbit-1 {
+  --scale: 1;
+  animation: spin 16s linear infinite;
+}
+
+.orbit-2 {
+  --scale: 0.82;
+  animation: spin 22s linear infinite reverse;
+}
+
+.orbit-3 {
+  --scale: 0.65;
+  animation: spin 30s linear infinite;
+}
+
+.orbit-4 {
+  --scale: 0.48;
+  animation: spin 14s linear infinite reverse;
+}
+
+.orbit-5 {
+  --scale: 0.32;
+  animation: spin 10s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: scale(var(--scale)) rotate(0deg);
+  }
+
+  to {
+    transform: scale(var(--scale)) rotate(360deg);
+  }
+}
+
+/* Knowledge Nodes */
+
+.knowledge-node {
+  position: absolute;
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 9999px;
+
+  background: rgba(217, 184, 94, 0.55);
+
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: scale(2);
+    opacity: 1;
+  }
+}

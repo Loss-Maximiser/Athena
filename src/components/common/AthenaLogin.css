@@ -1,0 +1,270 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+.athena-container {
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background:
+    radial-gradient(circle at top, rgba(255, 223, 130, .08), transparent 40%),
+    linear-gradient(180deg, #08111f 0%, #0c1730 60%, #050b16 100%);
+}
+
+.background-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, .02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.cursor-glow {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(212, 175, 55, .18), transparent 70%);
+  filter: blur(40px);
+}
+
+.hero {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.tree-wrapper {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.olive-tree {
+  width: 260px;
+  height: 260px;
+  animation: sway 8s ease-in-out infinite;
+}
+
+.leaf {
+  filter: drop-shadow(0 0 6px rgba(190, 255, 190, .2));
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50%       { transform: rotate(2deg); }
+}
+
+.content {
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  padding: 35px;
+  background: rgba(255, 255, 255, .05);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 30px;
+}
+
+.content h1 {
+  color: white;
+  font-size: 3rem;
+  letter-spacing: 10px;
+  font-weight: 700;
+}
+
+.content p {
+  margin-top: 18px;
+  color: #b9c3d6;
+  line-height: 1.8;
+}
+
+.content button {
+  margin-top: 80px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #09131f;
+  background: linear-gradient(135deg, #cfb77e, #f5deb0);
+  transition: .3s;
+}
+
+.content button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 50px rgba(231, 200, 125, .35);
+}
+
+.floating-leaves span {
+  position: absolute;
+  width: 12px;
+  height: 20px;
+  border-radius: 50%;
+  background: #a5b89a;
+  opacity: .6;
+  animation: fall 8s linear infinite;
+}
+
+.floating-leaves span:nth-child(1) { left: 20%; animation-delay: 0s; }
+.floating-leaves span:nth-child(2) { left: 40%; animation-delay: 2s; }
+.floating-leaves span:nth-child(3) { left: 55%; animation-delay: 4s; }
+.floating-leaves span:nth-child(4) { left: 75%; animation-delay: 6s; }
+.floating-leaves span:nth-child(5) { left: 90%; animation-delay: 1s; }
+
+@keyframes fall {
+  0%   { transform: translateY(-40px) rotate(0deg);   opacity: 0; }
+  10%  { opacity: .8; }
+  100% { transform: translateY(220px) rotate(360deg); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .olive-tree    { width: 220px; height: 220px; }
+  .content h1    { font-size: 2.3rem; }
+}
+
+
+/* ════════════════════════════════════════════════════════
+   Morph Login Button
+   ════════════════════════════════════════════════════════ */
+
+.athena-btn {
+  position: relative;
+  width: 240px;
+  height: 58px;
+  border: none;
+  border-radius: 16px;
+  background: #5E7A38;
+  outline: none;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+  box-shadow:
+    0 8px 22px rgba(94, 122, 56, 0.38),
+    0 2px 6px rgba(0, 0, 0, 0.10);
+  transition:
+    width            0.55s cubic-bezier(0.65, 0, 0.35, 1),
+    border-radius    0.55s cubic-bezier(0.65, 0, 0.35, 1),
+    background-color 0.40s ease,
+    box-shadow       0.40s ease,
+    transform        0.30s ease;
+}
+
+/* Hover: lift + brighten */
+.athena-btn:hover {
+  background: #6D8A43;
+  transform: translateY(-4px);
+  box-shadow:
+    0 16px 40px rgba(94, 122, 56, 0.45),
+    0 4px  10px rgba(0, 0, 0, 0.12);
+}
+
+/* Disable hover lift while animating */
+.athena-btn.clicking,
+.athena-btn.clicking:hover,
+.athena-btn.loading,
+.athena-btn.loading:hover {
+  transform: none;
+  cursor: default;
+}
+
+/* Loading: collapse to a circle */
+.athena-btn.loading {
+  width: 58px;
+  border-radius: 50%;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.20),
+    inset  2px  2px 8px rgba(255, 255, 255, 0.10),
+    inset -2px -2px 8px rgba(0,   0,   0,   0.25);
+}
+
+/* ── Press ripple ── */
+.athena-btn__ripple {
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.18)  0%,
+    rgba(255, 255, 255, 0.06) 60%,
+    transparent               100%
+  );
+  transform: scale(0);
+  transition: transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  pointer-events: none;
+}
+
+.athena-btn.clicking .athena-btn__ripple {
+  transform: scale(1);
+}
+
+/* ── Label (icon + text) ── */
+.athena-btn__label {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  user-select: none;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.athena-btn.clicking .athena-btn__label,
+.athena-btn.loading  .athena-btn__label {
+  opacity: 0;
+}
+
+/* ── Spinner ── */
+.athena-btn__spinner-wrap {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Delay until button has mostly collapsed */
+.athena-btn.loading .athena-btn__spinner-wrap {
+  opacity: 1;
+  transition: opacity 0.25s ease 0.38s;
+}
+
+.athena-btn__spinner-arc {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.20);
+  border-top-color:   rgba(255, 255, 255, 0.90);
+  border-right-color: rgba(255, 255, 255, 0.40);
+  animation: athenaSpin 0.75s linear infinite;
+}
+
+@keyframes athenaSpin {
+  to { transform: rotate(360deg); }
+}
