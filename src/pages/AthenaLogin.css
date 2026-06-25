@@ -1,0 +1,124 @@
+
+.athena-btn {
+  position: relative;
+  width: 240px;
+  height: 58px;
+  border: none;
+  border-radius: 16px;
+  background: var(--color-primary, #2563EB); /* Blue background */
+  outline: none;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+  box-shadow:
+    0 8px 22px rgba(37, 99, 235, 0.38),
+    0 2px 6px rgba(0, 0, 0, 0.10);
+  transition:
+    width            0.55s cubic-bezier(0.65, 0, 0.35, 1),
+    border-radius    0.55s cubic-bezier(0.65, 0, 0.35, 1),
+    background-color 0.40s ease,
+    box-shadow       0.40s ease,
+    transform        0.30s ease;
+}
+
+/* Hover: lift + brighten */
+.athena-btn:hover {
+  background: var(--color-primary-hover, #1D4ED8); /* Darker blue */
+  transform: translateY(-4px);
+  box-shadow:
+    0 16px 40px rgba(37, 99, 235, 0.45),
+    0 4px  10px rgba(0, 0, 0, 0.12);
+}
+
+/* Disable hover lift while animating */
+.athena-btn.clicking,
+.athena-btn.clicking:hover,
+.athena-btn.loading,
+.athena-btn.loading:hover {
+  transform: none;
+  cursor: default;
+}
+
+/* Loading: collapse to a circle */
+.athena-btn.loading {
+  width: 58px;
+  border-radius: 50%;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.20),
+    inset  2px  2px 8px rgba(255, 255, 255, 0.10),
+    inset -2px -2px 8px rgba(0,   0,   0,   0.25);
+}
+
+/* ── Press ripple ── */
+.athena-btn__ripple {
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.18)  0%,
+    rgba(255, 255, 255, 0.06) 60%,
+    transparent               100%
+  );
+  transform: scale(0);
+  transition: transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  pointer-events: none;
+}
+
+.athena-btn.clicking .athena-btn__ripple {
+  transform: scale(1);
+}
+
+/* ── Label (text) ── */
+.athena-btn__label {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  user-select: none;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.athena-btn.clicking .athena-btn__label,
+.athena-btn.loading  .athena-btn__label {
+  opacity: 0;
+}
+
+/* ── Spinner (Rotating Wheel) ── */
+.athena-btn__spinner-wrap {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Delay until button has mostly collapsed */
+.athena-btn.loading .athena-btn__spinner-wrap {
+  opacity: 1;
+  transition: opacity 0.25s ease 0.38s;
+}
+
+.athena-btn__spinner-arc {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.20);
+  border-top-color:   rgba(255, 255, 255, 0.90);
+  border-right-color: rgba(255, 255, 255, 0.40);
+  animation: athenaSpin 0.75s linear infinite;
+}
+
+@keyframes athenaSpin {
+  to { transform: rotate(360deg); }
+}

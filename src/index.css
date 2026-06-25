@@ -1,0 +1,39 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+@import "tailwindcss";
+
+/* 3. Your Custom Design Tokens (Variables) */
+@layer base {
+  :root {
+    /* Core Brand Colors (Blue Theme) */
+    --color-primary: #2563EB;       /* Royal Blue */
+    --color-primary-hover: #1D4ED8; /* Darker Blue */
+    --color-secondary: #0EA5E9;     /* Sky Blue */
+    
+    /* Backgrounds */
+    --color-bg-dark: #0A0F1C;       /* Login Background */
+    --color-bg-light: #F8FAFC;      /* Dashboard Background */
+    --color-surface: #FFFFFF;       /* White Cards */
+    
+    /* Typography */
+    --color-text-main: #1E293B;     
+    --color-text-muted: #64748B;    
+    --color-text-light: #F8FAFC;    
+    
+    /* Borders & Accents */
+    --color-border: #E2E8F0;
+    --color-graph-node: #38BDF8;    
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Inter", sans-serif;
+    background-color: var(--color-bg-light);
+    color: var(--color-text-main);
+  }
+}
