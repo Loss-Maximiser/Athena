@@ -1,171 +1,280 @@
-// src/pages/ChatPage.jsx
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Send, Paperclip, MoreVertical, ArrowLeft, MessageSquare, Users } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Paperclip, SendHorizontal } from "lucide-react";
+
+import PageContainer from "../components/layout/PageContainer";
+import PageHeader from "../components/layout/PageHeader";
+import ChatMessage from "../components/chat/ChatMessage";
+import { useChat } from "../contexts/ChatContext";
 
 export default function ChatPage() {
-  const { agentType } = useParams(); // URL se pata chalega HR hai ya General
   const navigate = useNavigate();
-  const messagesEndRef = useRef(null);
+  const { agentType } = useParams();
 
-  const [message, setMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState([]);
-  const [isTyping, setIsTyping] = useState(false);
+  const fileInputRef = useRef(null);
+  const bottomRef = useRef(null);
+  const textareaRef = useRef(null);
 
-  // Agent configuration based on URL
-  const agentDetails = {
-    general: {
-      name: "General Assistant",
-      icon: <MessageSquare size={20} className="text-yellow-500" />,
-      greeting: "Hello! I am Athena's General AI. Ask me anything from coding to drafting emails.",
-    },
-    hr: {
-      name: "HR Assistant",
-      icon: <Users size={20} className="text-emerald-500" />,
-      greeting: "Hi there! I am your HR Assistant. You can ask me about INGSOL's leave policies, payroll, or benefits.",
+  const {
+    user,
+    currentConversation,
+    currentConversationId,
+    createConversation,
+    openConversation,
+    messages,
+    sendMessage,
+    attachments,
+    addAttachment,
+    clearAttachments,
+    getDraft,
+    setDraft,
+    isLoading,
+    isStreaming,
+  } = useChat();
+
+  const [prompt, setPrompt] = useState("");
+
+  /* -------------------------------- */
+  /* Create Conversation              */
+  /* -------------------------------- */
+  useEffect(() => {
+    if (currentConversation) {
+      setPrompt(getDraft(currentConversation.id));
+      return;
     }
-  };
 
-  const currentAgent = agentDetails[agentType] || agentDetails.general;
+    const id = createConversation(agentType || "general");
+    openConversation(id);
+  }, []);
 
-  // Set initial greeting when page loads
+  /* -------------------------------- */
+  /* Load Draft                       */
+  /* -------------------------------- */
   useEffect(() => {
-    setChatHistory([{ sender: "ai", text: currentAgent.greeting }]);
-  }, [agentType]);
+    if (!currentConversationId) return;
+    setPrompt(getDraft(currentConversationId));
+  }, [currentConversationId]);
 
-  // Auto-scroll to bottom when new message arrives
+  /* -------------------------------- */
+  /* Save Draft                       */
+  /* -------------------------------- */
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory, isTyping]);
+    if (!currentConversationId) return;
 
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    if (!message.trim()) return;
+    setDraft(currentConversationId, prompt);
 
-    // Add user message to UI
-    const newUserMsg = { sender: "user", text: message };
-    setChatHistory((prev) => [...prev, newUserMsg]);
-    setMessage("");
-    setIsTyping(true);
+}, [prompt, currentConversationId]);
 
-    // TODO: Yahan par actual API call aayegi future me
-    // Filhal simulation ke liye setTimeout use kar rahe hain
-    setTimeout(() => {
-      let aiResponse = "I understand. I am processing your request.";
-      
-      // Basic mock logic to show difference to evaluator
-      if (agentType === "hr" && newUserMsg.text.toLowerCase().includes("maternity leave")) {
-        aiResponse = "According to INGSOL's HR policy, female employees are entitled to 26 weeks of paid maternity leave. For male employees, paternity leave is currently 14 days.";
-      }
+  /* -------------------------------- */
+  /* Scroll                           */
+  /* -------------------------------- */
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages, isLoading, isStreaming]);
 
-      setChatHistory((prev) => [...prev, { sender: "ai", text: aiResponse }]);
-      setIsTyping(false);
-    }, 1500);
-  };
+  /* -------------------------------- */
+  /* Files                            */
+  /* -------------------------------- */
+  function handleFiles(e) {
+    [...e.target.files].forEach((file) => {
+      addAttachment(file);
+    });
+  }
+
+  /* -------------------------------- */
+  /* Send                             */
+  /* -------------------------------- */
+  async function handleSend() {
+    if (!currentConversationId) return;
+    if (!prompt.trim() && attachments.length === 0) return;
+
+    await sendMessage(currentConversationId, prompt, attachments);
+    setPrompt("");
+    clearAttachments();
+
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "28px";
+    }
+  }
+
+  /* -------------------------------- */
+  /* Autosize                         */
+  /* -------------------------------- */
+  function handleInput(e) {
+    setPrompt(e.target.value);
+    e.target.style.height = "24px";
+    e.target.style.height = e.target.scrollHeight + "px";
+  }
 
   return (
-    <div className="flex h-screen bg-bg-light">
-      
-      {/* Mini Sidebar */}
-      <aside className="w-16 bg-white border-r border-border flex flex-col items-center py-6 gap-6 fixed h-full z-10">
-        <button onClick={() => navigate('/home')} className="p-2 hover:bg-gray-100 rounded-lg text-text-muted transition">
-          <ArrowLeft size={24} />
-        </button>
-        <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center">
-           <img src="/logo.png" alt="A" className="w-5 h-5 opacity-70" />
-        </div>
-      </aside>
+    <PageContainer>
+      <PageHeader title={`${agentType} Assistant`} subtitle="Athena Enterprise AI" />
 
-      {/* Main Chat Area */}
-      <main className="flex-1 ml-16 flex flex-col h-full relative">
-        
-        {/* Chat Header */}
-        <header className="h-16 bg-white border-b border-border flex items-center justify-between px-8 absolute w-full top-0 z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gray-50 border border-border flex items-center justify-center shadow-sm">
-              {currentAgent.icon}
-            </div>
-            <div>
-              <h2 className="font-semibold text-text-main leading-tight">{currentAgent.name}</h2>
-              <span className="text-[11px] text-emerald-500 font-medium flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Online
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Publish Dropdown Placeholder for future */}
-            <button className="text-xs font-medium text-primary bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition">
-              Publish Chat
-            </button>
-            <MoreVertical size={20} className="text-text-muted cursor-pointer" />
-          </div>
-        </header>
-
-        {/* Chat Messages Timeline */}
-        <div className="flex-1 overflow-y-auto p-8 pt-24 pb-32">
-          <div className="max-w-3xl mx-auto flex flex-col gap-6">
-            {chatHistory.map((msg, index) => (
-              <div key={index} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[75%] p-4 rounded-2xl text-[15px] leading-relaxed shadow-sm ${
-                  msg.sender === "user" 
-                    ? "bg-primary text-white rounded-br-none" 
-                    : "bg-white text-text-main border border-border rounded-bl-none"
-                }`}>
-                  {msg.text}
-                </div>
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.25 }}
+        className="flex-1 overflow-y-auto px-8 pt-6 pb-40"
+      >
+        <div
+          className={`mx-auto flex w-full max-w-[760px] flex-col ${
+            messages.length === 0 ? "h-full justify-center" : ""
+          }`}
+        >
+          {messages.length === 0 && (
+            <div className="flex flex-1 min-h-[calc(100vh-260px)] flex-col items-center justify-center">
+              <img
+                src="/assets/logo.png"
+                alt="Athena"
+                className="mb-8 h-20 w-20 opacity-90"
+              />
+              <h2 className="text-4xl font-semibold text-slate-900">
+                Welcome to Athena
+              </h2>
+              <p className="mt-3 max-w-md text-center text-slate-500">
+                How can I help you today?
+              </p>
+              <div className="mt-10 flex flex-wrap justify-center gap-3">
+                {[
+                  "Explain the process of leave",
+                  "Why my salary deducted",
+                  "Summarize document",
+                  "What is company policies",
+                ].map((item) => (
+                  <button
+                    key={item}
+                    onClick={() => setPrompt(item)}
+                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm transition hover:border-blue-300 hover:bg-blue-50 hover:shadow-md"
+                  >
+                    {item}
+                  </button>
+                ))}
               </div>
+            </div>
+          )}
+
+          <AnimatePresence>
+            {messages.map((msg) => (
+              <ChatMessage
+    key={msg.id}
+    message={msg.text}
+    isUser={msg.role==="user"}
+    onRetry={() => setPrompt(msg.text)}
+/>
             ))}
-            
-            {/* Typing Indicator */}
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-border p-4 rounded-2xl rounded-bl-none flex items-center gap-2 shadow-sm">
-                  <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"></span>
-                  <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
-                  <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+          </AnimatePresence>
+
+          {isLoading && (
+            <div className="mt-8 flex items-center gap-3">
+              <div className="h-2 w-2 animate-bounce rounded-full bg-blue-600" />
+              <div
+                className="h-2 w-2 animate-bounce rounded-full bg-blue-500"
+                style={{ animationDelay: ".15s" }}
+              />
+              <div
+                className="h-2 w-2 animate-bounce rounded-full bg-blue-400"
+                style={{ animationDelay: ".3s" }}
+              />
+              <p className="text-sm text-slate-500">Athena is thinking...</p>
+            </div>
+          )}
+
+          <div ref={bottomRef} />
         </div>
+      </motion.section>
 
-        {/* Input Area */}
-        <div className="absolute bottom-0 w-full bg-gradient-to-t from-bg-light via-bg-light to-transparent p-6">
-          <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto relative bg-white border border-border rounded-2xl shadow-lg flex items-end overflow-hidden focus-within:border-primary/50 transition-colors">
-            
-            <button type="button" className="p-4 text-gray-400 hover:text-primary transition">
-              <Paperclip size={20} />
-            </button>
+      {/* ---------------------------------- */}
+      {/* COMPOSER                           */}
+      {/* ---------------------------------- */}
+      <motion.footer
+  layout
+  className={`
 
-            <textarea
-              rows="1"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage(e);
-                }
-              }}
-              placeholder={`Ask ${currentAgent.name} anything...`}
-              className="flex-1 max-h-32 p-4 pl-0 bg-transparent resize-none focus:outline-none text-text-main"
+px-6
+
+transition-all
+
+duration-500
+
+${
+messages.length===0
+?
+"pb-24"
+:
+"pb-6 pt-3"
+}
+
+`}
+>
+        <div className="mx-auto w-full max-w-[860px]">
+          {/* Attachments */}
+          {attachments.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {attachments.map((file, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-sm text-blue-700"
+                >
+                  <Paperclip size={14} />
+                  <span className="max-w-[180px] truncate">{file.name}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Composer Box */}
+          <div className="flex items-center gap-2 rounded-[30px] border border-slate-300 bg-white px-3 py-2 shadow-md transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100">
+            {/* Hidden File Input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              hidden
+              multiple
+              onChange={handleFiles}
             />
 
-            <button 
-              type="submit" 
-              disabled={!message.trim() || isTyping}
-              className="p-4 text-white bg-primary m-2 rounded-xl hover:bg-primary-hover disabled:opacity-50 disabled:hover:bg-primary transition"
+            {/* Attach Button */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-blue-600"
             >
-              <Send size={18} />
+              <Paperclip size={17} />
             </button>
-          </form>
-          <div className="text-center mt-3 text-[11px] text-text-muted">
-            Athena AI can make mistakes. Verify important information.
-          </div>
-        </div>
 
-      </main>
-    </div>
+            {/* Textarea */}
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              value={prompt}
+              onChange={handleInput}
+              placeholder="Message Athena..."
+              className="max-h-36 flex-1 resize-none bg-transparent py-2 text-[15px] leading-6 text-slate-800 outline-none placeholder:text-slate-400 overflow-y-auto"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+            />
+
+            {/* Send Button */}
+            <button
+              disabled={!prompt.trim() && attachments.length === 0}
+              onClick={handleSend}
+              className="flex h-10 w-10 items-center justify-center rounded-fullbg-gradient-to-br from-blue-600 to-sky-500 text-white transition-all duration-200 hover:scale-105 hover:bg-blue-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <SendHorizontal size={17} />
+            </button>
+          </div>
+
+          <p className="mt-3 text-center text-xs text-slate-400">
+            Athena can make mistakes. Verify important information.
+          </p>
+        </div>
+      </motion.footer>
+    </PageContainer>
   );
 }

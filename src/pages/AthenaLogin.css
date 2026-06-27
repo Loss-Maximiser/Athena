@@ -67,8 +67,12 @@
   transform: scale(0);
   transition: transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
   pointer-events: none;
+  
 }
 
+.athen-btn.loading{
+width:57px;
+}
 .athena-btn.clicking .athena-btn__ripple {
   transform: scale(1);
 }
